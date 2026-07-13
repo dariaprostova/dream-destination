@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dream Destination</title>
+<style>
+  :root{
+    --ink:#141414; --soft:#767676; --faint:#a8a8a8;
+    --line:#e7e5e0; --bg:#fbfaf8; --card:#ffffff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg); color:var(--ink);
+    font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:720px; margin:0 auto; padding:0 20px 120px;}
+  h1,h2{font-family:Georgia,"Times New Roman",serif; font-weight:400;}
+
+  .top{padding:34px 0 20px; display:flex; align-items:baseline; justify-content:space-between; gap:16px;}
+  .top h1{font-size:22px;}
+  .top h1 em{font-style:italic;}
+  .top .meta{font-size:12px; color:var(--faint); text-align:right; line-height:1.5;}
+  .top .meta b{color:var(--ink); font-weight:600;}
+
+  .tabs{position:sticky; top:0; z-index:50; background:rgba(251,250,248,.96); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); margin:0 -20px; padding:0 20px;}
+  .tabs-in{max-width:720px; margin:0 auto; display:flex; overflow-x:auto;}
+  .tab{flex-shrink:0; font-size:13.5px; color:var(--soft); background:none; border:none; border-bottom:2px solid transparent; padding:13px 15px; cursor:pointer; font-family:inherit; white-space:nowrap;}
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:var(--ink); border-bottom-color:var(--ink); font-weight:600;}
+
+  .page{display:none; animation:fade .25s ease;}
+  .page.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+  .sec-label{font-size:10.5px; letter-spacing:.2em; text-transform:lowercase; color:var(--faint);}
+  h2{font-size:23px; margin-top:2px;}
+  .page-head{margin:30px 0 6px; display:flex; align-items:baseline; justify-content:space-between; gap:14px;}
+  .deadline{font-size:12px; color:var(--soft); white-space:nowrap;}
+  .desc{color:var(--soft); font-size:13.5px; margin-bottom:20px; max-width:580px;}
+  .card{background:var(--card); border:1px solid var(--line); padding:20px 24px; margin-bottom:14px;}
+  .card h3{font-size:14.5px; font-weight:600; margin-bottom:10px;}
+  .card .note{font-size:12.5px; color:var(--soft); margin:-4px 0 12px; line-height:1.55;}
+
+  .task{display:flex; gap:11px; align-items:flex-start; padding:8px 0; border-top:1px solid #f2f0ec;}
+  .task:first-of-type{border-top:none;}
+  .task input[type=checkbox]{margin-top:4px; width:16px; height:16px; flex-shrink:0; accent-color:var(--ink); cursor:pointer;}
+  .task label, .task .t-text{cursor:pointer; flex:1;}
+  .task small{display:block; color:var(--faint); font-size:12px; line-height:1.5;}
+  .task input:checked + label, .task input:checked + .t-text{color:var(--faint); text-decoration:line-through; text-decoration-color:#d8d5cf;}
+  .task .x{background:none; border:none; color:#d0cdc7; font-size:16px; cursor:pointer; padding:0 2px; line-height:1; margin-top:3px;}
+  .task .x:hover{color:var(--ink);}
+  .task.milestone label{font-weight:600;}
+
+  .adder{display:flex; gap:8px; margin-top:12px;}
+  .adder input{flex:1;}
+
+  input[type=text], input[type=number], input[type=date], select, textarea{
+    border:1px solid var(--line); background:var(--bg); padding:9px 12px;
+    font:inherit; font-size:14px; color:var(--ink); width:100%;
+  }
+  textarea{resize:vertical; min-height:58px;}
+  input:focus, select:focus, textarea:focus{outline:none; border-color:#b5b1a8;}
+  button.btn{font:inherit; font-size:12.5px; letter-spacing:.07em; text-transform:lowercase; background:var(--ink); color:#fff; border:none; padding:10px 22px; cursor:pointer;}
+  button.btn:hover{background:#333;}
+  button.ghost{font:inherit; font-size:12.5px; background:none; color:var(--soft); border:1px solid var(--line); padding:7px 14px; cursor:pointer;}
+  button.ghost:hover{color:var(--ink); border-color:#b5b1a8;}
+
+  .bar{height:2px; background:var(--line); position:relative;}
+  .bar i{position:absolute; left:0; top:0; bottom:0; background:var(--ink); transition:width .4s;}
+
+  .q{margin-bottom:14px;}
+  .q label{display:block; font-size:12.5px; font-weight:600; margin-bottom:5px;}
+
+  .entry{border:1px solid var(--line); background:var(--card); padding:18px 22px; margin-top:12px;}
+  .entry .e-head{font-family:Georgia,serif; font-size:15px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:baseline; gap:10px;}
+  .entry dt{font-size:10.5px; letter-spacing:.12em; text-transform:lowercase; color:var(--faint); margin-top:9px;}
+  .entry dd{font-size:13.5px; white-space:pre-wrap;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{font-size:10px; letter-spacing:.13em; text-transform:lowercase; color:var(--faint); font-weight:500; text-align:left; padding:7px 8px; border-bottom:1px solid var(--line);}
+  td{padding:7px 8px; border-bottom:1px solid #f2f0ec; vertical-align:top;}
+
+  .hint{font-size:12px; color:var(--faint); margin-top:12px; line-height:1.6;}
+
+  /* daily */
+  .cycle-box{display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+  .cycle-num{font-family:Georgia,serif; font-size:44px; line-height:1;}
+  .cycle-num span{font-size:13px; color:var(--faint); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  .brow{display:flex; gap:12px; padding:8px 0; border-top:1px solid #f2f0ec; font-size:13.5px; line-height:1.55;}
+  .brow:first-of-type{border-top:none;}
+  .brow .tag{font-size:10px; letter-spacing:.1em; text-transform:lowercase; color:var(--faint); width:86px; flex-shrink:0; padding-top:2px;}
+  .brow span:last-child{flex:1;}
+  .doc-links a{color:var(--ink); font-size:13.5px;}
+  .state-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .energy-dots{display:flex; gap:6px;}
+  .energy-dots button{width:32px; height:32px; border-radius:50%; border:1px solid var(--line); background:var(--card); cursor:pointer; font-size:12px; color:var(--soft);}
+  .energy-dots button.on{background:var(--ink); color:#fff; border-color:var(--ink);}
+
+  /* weekly */
+  .week-nav{display:flex; align-items:center; gap:12px;}
+  .week-nav button{background:none; border:1px solid var(--line); width:30px; height:30px; cursor:pointer; color:var(--soft); font-size:14px;}
+  .week-nav button:hover{color:var(--ink); border-color:#b5b1a8;}
+  .week-theme{font-family:Georgia,serif; font-size:18px; margin-bottom:4px;}
+  .focus-row{display:flex; gap:10px; align-items:center; padding:7px 0; border-top:1px solid #f2f0ec;}
+  .focus-row:first-of-type{border-top:none;}
+  .focus-row input[type=checkbox]{width:16px; height:16px; accent-color:var(--ink); flex-shrink:0; cursor:pointer;}
+  .focus-row .tag{font-size:10px; letter-spacing:.1em; text-transform:lowercase; color:var(--faint); width:74px; flex-shrink:0;}
+  .focus-row{align-items:flex-start;}
+  .focus-row .tag{padding-top:8px;}
+  .focus-row input[type=checkbox]{margin-top:8px;}
+  .focus-row textarea{border:none; background:none; padding:6px 4px; border-bottom:1px solid transparent; resize:none; overflow:hidden; min-height:0; line-height:1.5;}
+  .focus-row textarea:focus{border-bottom-color:var(--line);}
+  .focus-row input[type=checkbox]:checked ~ textarea{color:var(--faint); text-decoration:line-through;}
+
+  /* lowercase aesthetic */
+  h1,h2,h3,.tab,.desc,.card .note,.q label,.task label,.task small,.brow,.vision,.ccard,.week-theme,.deadline,button,.hint,.e-head,.star p,.fin-table td:first-child,#month-progress,.verbs span,.manifest-p{text-transform:lowercase;}
+  .task .t-text,.entry dd,input,textarea,select{text-transform:none;}
+
+  /* compass */
+  .star{background:var(--card); border:1px solid var(--line); padding:26px 28px; margin-bottom:14px;}
+  .star .sec-label{color:var(--faint);}
+  .star p{font-family:Georgia,serif; font-size:16.5px; line-height:1.65; margin-top:10px;}
+  .verbs{margin-top:16px; display:flex; flex-wrap:wrap; gap:7px;}
+  .verbs span{font-size:11.5px; letter-spacing:.07em; border:1px solid var(--line); padding:3px 11px; border-radius:99px; color:var(--soft);}
+  .manifest-p{font-size:14px; line-height:1.7;}
+  .rule{display:flex; gap:12px; padding:7px 0; border-top:1px solid #f2f0ec; font-size:13.5px; line-height:1.55;}
+  .rule:first-of-type{border-top:none;}
+  .rule b{font-family:Georgia,serif; font-weight:400; color:var(--faint); flex-shrink:0; width:18px;}
+  .compass-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:26px;}
+  .ccard{border:1px solid var(--line); background:var(--card); padding:16px 18px; cursor:pointer; text-align:left; font-family:inherit;}
+  .ccard:hover{border-color:#b5b1a8;}
+  .ccard b{font-family:Georgia,serif; font-weight:400; font-size:16.5px; display:block;}
+  .ccard .cline{font-size:11.5px; color:var(--soft); margin:3px 0 12px; line-height:1.45; min-height:32px;}
+  .ccard .cpct{font-size:11px; color:var(--faint); margin-top:5px;}
+  details.stage{border:1px solid var(--line); background:var(--card); margin-bottom:12px;}
+  details.stage summary{cursor:pointer; padding:16px 22px; display:flex; justify-content:space-between; align-items:center; gap:12px; list-style:none;}
+  details.stage summary::-webkit-details-marker{display:none;}
+  details.stage summary .s-title{font-family:Georgia,serif; font-size:17px;}
+  details.stage summary .s-pct{font-size:11.5px; color:var(--soft); white-space:nowrap;}
+  details.stage .stage-body{padding:0 22px 18px;}
+  details.stage .stage-body h3{font-size:13.5px; font-weight:600; margin-top:16px; margin-bottom:4px;}
+  details.stage .vision{font-size:13px; color:var(--soft); font-style:italic; margin-bottom:10px; line-height:1.6;}
+
+  /* finance tables */
+  .fin-table td:first-child{color:var(--soft);}
+  .fin-table input{border:none; background:none; text-align:right; padding:2px 4px; font-size:13.5px; width:110px; border-bottom:1px solid transparent;}
+  .fin-table input:focus{border-bottom-color:var(--line);}
+  .fin-table td:last-child{text-align:right;}
+  .fin-table tr.calc td{color:var(--ink); font-weight:600; border-top:1px solid var(--line);}
+
+  .backup{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:20px;}
+  footer{margin-top:70px; text-align:center; color:var(--faint); font-size:12px; font-family:Georgia,serif; font-style:italic;}
+
+  @media(max-width:600px){
+    .compass-grid{grid-template-columns:1fr;}
+    .state-grid{grid-template-columns:1fr;}
+    .top{flex-direction:column; gap:6px;}
+    .top .meta{text-align:left;}
+    .ccard .cline{min-height:0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<div class="top">
+  <h1>Dream <em>Destination</em></h1>
+  <div class="meta"><span id="today-str"></span> · до 31.08 — <b id="cd-days"></b> дн. · план лета: <b id="cd-total"></b></div>
+</div>
+
+<div class="tabs"><div class="tabs-in">
+  <button class="tab" data-page="manifest">компас</button>
+  <button class="tab" data-page="compass">ориентиры</button>
+  <button class="tab" data-page="daily">сегодня</button>
+  <button class="tab" data-page="weekly">неделя</button>
+  <button class="tab" data-page="biweekly">2 недели</button>
+  <button class="tab" data-page="monthly">месяц</button>
+</div></div>
+
+<!-- ════════════════ DAILY ════════════════ -->
+<section class="page" id="page-daily">
+  <div class="page-head">
+    <div><div class="sec-label">Каждый день · 2 минуты</div><h2 id="daily-title">Сегодня</h2></div>
+  </div>
+
+  <div class="card">
+    <div class="cycle-box">
+      <div class="cycle-num"><b id="cycle-day">—</b> <span>день цикла</span></div>
+      <div style="flex:1"></div>
+      <button class="ghost" id="new-cycle">Сегодня начался новый цикл</button>
+    </div>
+    <div class="hint" id="cycle-hint"></div>
+  </div>
+
+  <div class="card">
+    <h3>Тело сегодня</h3>
+    <div class="note">Из твоих планов тренировок и питания — по дню недели и фазе цикла. Силовые: вт · чт · сб</div>
+    <div class="brow"><span class="tag">Движение</span><span id="body-train"></span></div>
+    <div class="brow"><span class="tag">Фаза</span><span id="body-phase"></span></div>
+    <div class="brow"><span class="tag">Питание</span><span id="body-food"></span></div>
+  </div>
+
+  <div class="card">
+    <h3>Энергия</h3>
+    <div class="state-grid">
+      <div class="q"><label>Уровень энергии</label><div class="energy-dots" id="energy-dots">
+        <button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button>
+      </div></div>
+      <div class="q"><label>Сон, часов</label><input type="number" id="d-sleep" min="0" max="14" step="0.5" placeholder="—"></div>
+    </div>
+    <div class="q"><label>+ Что сегодня дало энергию</label><input type="text" id="d-gave" placeholder="люди, дела, места…"></div>
+    <div class="q" style="margin-bottom:0"><label>− Что забрало энергию</label><input type="text" id="d-took" placeholder="…"></div>
+  </div>
+
+  <div class="card">
+    <h3>Ежедневные опоры</h3>
+    <div id="habit-list"></div>
+    <div class="adder"><input type="text" id="new-habit" placeholder="добавить опору…"><button class="ghost" id="add-habit">+</button></div>
+  </div>
+
+  <div class="card">
+    <h3>Задачи на сегодня</h3>
+    <div class="note">1–3 шага из фокуса недели →</div>
+    <div id="dtask-list"></div>
+    <div class="adder"><input type="text" id="new-dtask" placeholder="что сделать сегодня…"><button class="ghost" id="add-dtask">+</button></div>
+  </div>
+
+  <div class="card">
+    <h3>Последние 14 дней</h3>
+    <table><thead><tr><th>Дата</th><th>Цикл</th><th>Энергия</th><th>Сон</th><th>Опоры</th><th>Дало / забрало</th></tr></thead><tbody id="daily-history"></tbody></table>
+  </div>
+</section>
+
+<!-- ════════════════ WEEKLY ════════════════ -->
+<section class="page" id="page-weekly">
+  <div class="page-head">
+    <div><div class="sec-label">Ревизия по понедельникам</div><h2>Неделя</h2></div>
+    <div class="week-nav"><button id="wk-prev">←</button><span class="deadline" id="wk-range"></span><button id="wk-next">→</button></div>
+  </div>
+
+  <div class="card">
+    <div class="week-theme" id="wk-theme"></div>
+    <div class="note" id="wk-theme-note"></div>
+  </div>
+
+  <div class="card">
+    <h3>Три результата недели</h3>
+    <div class="note">Уже предзаполнены из летней стратегии — правь под себя, отмечай по факту</div>
+    <div class="focus-row"><input type="checkbox" id="wf1d"><span class="tag">Профессия</span><textarea id="wf1" rows="1" placeholder="главный профессиональный результат"></textarea></div>
+    <div class="focus-row"><input type="checkbox" id="wf2d"><span class="tag">Деньги</span><textarea id="wf2" rows="1" placeholder="финансовый шаг"></textarea></div>
+    <div class="focus-row"><input type="checkbox" id="wf3d"><span class="tag">Опора</span><textarea id="wf3" rows="1" placeholder="здоровье или жизнь"></textarea></div>
+  </div>
+
+  <div class="card">
+    <h3>Задачи недели</h3>
+    <div class="note">Предзаполнены из плана. Ритм тела: вт A · чт B · сб C · пн/ср йога · вс отдых + белковая еда на неделю</div>
+    <div id="wtask-list"></div>
+    <div class="adder"><input type="text" id="new-wtask" placeholder="добавить задачу или событие…"><button class="ghost" id="add-wtask">+</button></div>
+  </div>
+
+  <div class="card">
+    <h3>Понедельничная ревизия</h3>
+    <div class="q"><label>1 · Что реально произошло за неделю?</label><textarea id="rq1"></textarea></div>
+    <div class="q"><label>2 · Что приблизило меня к новой жизни?</label><textarea id="rq2"></textarea></div>
+    <div class="q"><label>3 · Куда ушло внимание впустую?</label><textarea id="rq3"></textarea></div>
+    <div class="q"><label>4 · Какая у меня энергия и фаза цикла?</label><textarea id="rq4"></textarea></div>
+    <button class="btn" id="save-review">Сохранить ревизию</button>
+    <span class="hint" id="review-saved"></span>
+  </div>
+
+  <div id="week-history"></div>
+</section>
+
+<!-- ════════════════ BIWEEKLY ════════════════ -->
+<section class="page" id="page-biweekly">
+  <div class="page-head">
+    <div><div class="sec-label">Сверка раз в две недели</div><h2>Спринт</h2></div>
+    <div class="deadline" id="sprint-range"></div>
+  </div>
+  <div class="desc" id="sprint-desc"></div>
+
+  <div class="card">
+    <h3 id="sprint-title">Текущий спринт</h3>
+    <div class="q"><label>Продукт и позиционирование — что сдвинулось?</label><textarea id="bq1"></textarea></div>
+    <div class="q"><label>Деньги — что пришло, что в воронке, что с подушкой?</label><textarea id="bq2"></textarea></div>
+    <div class="q"><label>Здоровье и энергия — что с рутиной, циклом, алкоголем?</label><textarea id="bq3"></textarea></div>
+    <div class="q"><label>Что убираю или меняю на следующие две недели?</label><textarea id="bq4"></textarea></div>
+    <button class="btn" id="save-bi">Сохранить сверку</button>
+  </div>
+
+  <div id="bi-history"></div>
+</section>
+
+<!-- ════════════════ MONTHLY ════════════════ -->
+<section class="page" id="page-monthly">
+  <div class="page-head">
+    <div><div class="sec-label">Сверка раз в месяц</div><h2>Месяц</h2></div>
+    <div class="deadline" id="month-name"></div>
+  </div>
+  <div class="desc">Взгляд сверху: движусь ли я по всем сферам — или расфокусировалась.</div>
+
+  <div class="card">
+    <h3>Прогресс по сферам</h3>
+    <div id="month-progress"></div>
+  </div>
+
+  <div class="card">
+    <h3>Месячная сверка</h3>
+    <div class="q"><label>Главные результаты месяца</label><textarea id="mq1"></textarea></div>
+    <div class="q"><label>Что не сработало и почему</label><textarea id="mq2"></textarea></div>
+    <div class="q"><label>Где я расфокусировалась / какие цели оказались навязанными</label><textarea id="mq3"></textarea></div>
+    <div class="q"><label>Фокус следующего месяца — одним абзацем</label><textarea id="mq4"></textarea></div>
+    <button class="btn" id="save-mo">Сохранить сверку месяца</button>
+  </div>
+
+  <div id="mo-history"></div>
+</section>
+
+<!-- ════════════════ COMPASS ════════════════ -->
+<section class="page" id="page-compass">
+  <div class="page-head">
+    <div><div class="sec-label">семь сфер моей жизни</div><h2>ориентиры</h2></div>
+  </div>
+
+  <div class="card">
+    <h3>как это работает — по расписанию, не по дисциплине</h3>
+    <div class="brow"><span class="tag">каждый день</span><span>2 мин · вкладка «сегодня»: энергия, сон, опоры, 1–3 задачи. открыла — отметила — закрыла.</span></div>
+    <div class="brow"><span class="tag">понедельник</span><span>30 мин · вкладка «неделя»: сохранить ревизию прошлой недели, посмотреть новую — она уже предзаполнена из стратегии. потом зайти сюда и поставить галочки за то, что закрылось. это единственный момент, когда ориентиры заполняются.</span></div>
+    <div class="brow"><span class="tag">раз в 2 нед</span><span>15 мин · вкладка «2 недели»: в конце спринта ответить на 4 вопроса.</span></div>
+    <div class="brow"><span class="tag">раз в месяц</span><span>20 мин · вкладка «месяц»: посмотреть прогресс сфер, сохранить сверку.</span></div>
+    <div class="brow"><span class="tag">важно</span><span>ориентиры — карта, а не список дел: между понедельниками сюда ничего вносить не нужно. недельные задачи уже составлены так, что закрывают эти чек-листы. если неделя сорвалась — ничего не догоняем: в понедельник просто открывается следующая.</span></div>
+  </div>
+
+  <div class="compass-grid" id="compass-grid"></div>
+
+  <!-- 1 · Перепридумывание себя -->
+  <details class="stage" data-sec="self" data-title="Перепридумывание себя" data-line="Позиционирование шире йоги · продукт · публичный образ">
+    <summary><span class="s-title">Перепридумывание себя</span><span class="s-pct"></span></summary>
+    <div class="stage-body">
+      <div class="vision">Собрать все сильные стороны в одну ясную историю: кто я сегодня и зачем идти именно ко мне. Не перестать быть йога-тичером — сделать йогу одной из граней.</div>
+      <h3>Итог лета</h3>
+      <div class="task milestone"><input type="checkbox" id="g1"><label for="g1">Понятное позиционирование шире йоги</label></div>
+      <div class="task milestone"><input type="checkbox" id="g2"><label for="g2">Первый протестированный способ зарабатывать вне регулярных классов</label></div>
+      <h3>Ядро · до 27.07</h3>
+      <div class="task"><input type="checkbox" id="t1"><label for="t1">Доработать формулировку позиционирования<small>Основа: «создаю 360°-опыты, придумываю концепцию, собираю команду, веду человека через глубокий опыт»</small></label></div>
+      <div class="task"><input type="checkbox" id="t2"><label for="t2">Портфолио: 5–7 кейсов с фото/видео<small>Sektaschool · Nike · Soft Power · ретриты · фестивали · корпоративные. Для каждого: задача, роль, масштаб, результат</small></label></div>
+      <div class="task"><input type="checkbox" id="t3"><label for="t3">Выбрать ОДИН продукт вне регулярной йоги<small>Консалтинг · корпоративный wellbeing · событие/ретрит под ключ · стратегическая сессия · авторский experience-проект</small></label></div>
+      <div class="task"><input type="checkbox" id="t4"><label for="t4">Описать результат продукта для клиента</label></div>
+      <div class="task"><input type="checkbox" id="t5"><label for="t5">Предложить первым потенциальным заказчикам</label></div>
+      <h3>Проверка рынком · до 15.08</h3>
+      <div class="task"><input type="checkbox" id="m1"><label for="m1">5 разговоров с потенциальными клиентами/партнёрами</label></div>
+      <div class="task"><input type="checkbox" id="m2"><label for="m2">Предложить новый формат</label></div>
+      <div class="task"><input type="checkbox" id="m3"><label for="m3">Минимум одна платная или пилотная работа</label></div>
+      <div class="task"><input type="checkbox" id="m4"><label for="m4">Записывать: за что платят, какими словами описывают ценность</label></div>
+      <h3>Публичный образ · до 15.08</h3>
+      <div class="task"><input type="checkbox" id="m5"><label for="m5">Обновить описание Instagram</label></div>
+      <div class="task"><input type="checkbox" id="m6"><label for="m6">Закрепить пост о профессиональном пути</label></div>
+      <div class="task"><input type="checkbox" id="m7"><label for="m7">Показать кейсы Nike, Sektaschool, Soft Power</label></div>
+      <div class="task"><input type="checkbox" id="m8"><label for="m8">Говорить шире йоги: архитектура опыта, команды, wellbeing<small>Сайт переписывать на основании ясности, а не искать ясность в сайте</small></label></div>
+      <h3>Осень</h3>
+      <div class="task"><input type="checkbox" id="a7"><label for="a7">Выбрать ОДИН большой проект на осень<small>Серия событий · корпоративный wellbeing · консалтинг · флагман Soft Power · партнёрство с брендом · longevity + искусство</small></label></div>
+      <div class="task"><input type="checkbox" id="l3"><label for="l3">Международные проекты: well-being, longevity, biohacking</label></div>
+      <div class="task"><input type="checkbox" id="l4"><label for="l4">Крупные компании, выступления, сильная команда</label></div>
+      <div class="task"><input type="checkbox" id="l5"><label for="l5">Новый сайт на основе проверенного позиционирования</label></div>
+    </div>
+  </details>
+
+  <!-- 2 · Финансы -->
+  <details class="stage" data-sec="fin" data-title="Финансы" data-line="Таблица бюджета · корзины к 30 000 € · подушка">
+    <summary><span class="s-title">Финансы</span><span class="s-pct"></span></summary>
+    <div class="stage-body">
+      <div class="vision">Не «как больше зарабатывать», а построить систему: несколько источников, подушка, инвестиции — путь к 30 тыс. € в месяц.</div>
+
+      <h3>Моя финансовая картина <span style="font-weight:400;color:var(--faint)">— заполни цифрами, они сохранятся</span></h3>
+      <table class="fin-table">
+        <tr><td>Средний доход / мес (последние 6 мес)</td><td><input type="number" data-fin="avg" placeholder="0"> €</td></tr>
+        <tr><td>Минимум / мес</td><td><input type="number" data-fin="min" placeholder="0"> €</td></tr>
+        <tr><td>Комфорт / мес</td><td><input type="number" data-fin="comfort" placeholder="0"> €</td></tr>
+        <tr><td>Накопления сейчас</td><td><input type="number" data-fin="savings" placeholder="0"> €</td></tr>
+        <tr><td>Бюджет поездки в США</td><td><input type="number" data-fin="usa" placeholder="0"> €</td></tr>
+        <tr class="calc"><td>Цель подушки (6 × минимум)</td><td id="fin-cushion">—</td></tr>
+        <tr class="calc"><td>Разрыв до цели 30 000 €</td><td id="fin-gap">—</td></tr>
+      </table>
+
+      <h3 style="margin-top:22px;">Корзины дохода → 30 000 €</h3>
+      <table class="fin-table" id="baskets">
+        <tr><th>Источник</th><th style="text-align:right">Сейчас €/мес</th><th style="text-align:right">Цель €/мес</th></tr>
+      </table>
+
+      <h3 style="margin-top:22px;">Задачи</h3>
+      <div class="task milestone"><input type="checkbox" id="g3"><label for="g3">Финансовый план и система учёта денег — работает</label></div>
+      <div class="task"><input type="checkbox" id="w1"><label for="w1">Заполнить таблицу картины выше (факты, не оценки)</label></div>
+      <div class="task"><input type="checkbox" id="fin1"><label for="fin1">Выбрать систему учёта (приложение или таблица) и вести месяц без пропусков</label></div>
+      <div class="task"><input type="checkbox" id="w6"><label for="w6">Понять, сколько часов в неделю реально есть на развитие нового</label></div>
+      <div class="task"><input type="checkbox" id="t7"><label for="t7">Заполнить корзины дохода: где сейчас, где цель</label></div>
+      <div class="task"><input type="checkbox" id="t8"><label for="t8">Подушка: фиксированная доля с каждого поступления<small>Начать даже с малого процента</small></label></div>
+      <div class="task"><input type="checkbox" id="t9"><label for="t9">Инвестсчёт — после ясности с резервом, расходами и налогами<small>Не вкладывать деньги, нужные для жизни и США</small></label></div>
+      <div class="task"><input type="checkbox" id="a1"><label for="a1">К 31.08: оценить — появился ли доход вне регулярных классов</label></div>
+      <div class="task"><input type="checkbox" id="l1"><label for="l1">Долгосрок: стабильные 30 тыс. € из нескольких источников</label></div>
+      <div class="task"><input type="checkbox" id="l2"><label for="l2">Долгосрок: подушка сформирована, инвестиции запущены</label></div>
+    </div>
+  </details>
+
+  <!-- 3 · Здоровье -->
+  <details class="stage" data-sec="health" data-title="Здоровье" data-line="Тренировки вт/чт/сб · питание · железо · без алкоголя">
+    <summary><span class="s-title">Здоровье</span><span class="s-pct"></span></summary>
+    <div class="stage-body">
+      <div class="vision">Энергия — фундамент всего плана. Не героизм, а бережная система под цикл, щитовидку и восстановление.</div>
+      <div class="brow"><span class="tag">Тренировки</span><span>3 силовые: вт A-низ · чт B-верх · сб C-всё тело (старт 14.07) + йога как восстановление. Не до отказа (RIR 2–3), 48 ч между силовыми, разгрузка каждую 4-ю неделю и в ПМС (−40%). Без HIIT и прыжков, бережём ахилл.</span></div>
+      <div class="brow"><span class="tag">Питание</span><span>1900–2100 ккал · белок 95–120 г (3–4 × 25–35 г) · клетчатка 25–30 г. Тарелка: ½ овощи, ¼ белок, ¼ сложные углеводы. Поддержка, не дефицит (Хашимото). Без длинных голоданий и йод-БАДов.</span></div>
+      <div class="brow"><span class="tag">Приоритет</span><span>Железо: ферритин был 13.7 → цель &gt;50. Железо едой + витамин C, кофе не сразу после еды. Железо/кальций — не раньше 4 ч после Эутирокса.</span></div>
+      <div class="brow doc-links"><span class="tag">Документы</span><span><a href="file:///Users/daraprostova/Desktop/medical%20twsts/%D0%A2%D1%80%D0%B5%D0%BD%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B8%20%E2%80%94%20%D0%94%D0%B0%D1%88%D0%B0.pdf" target="_blank">Тренировки — Даша.pdf</a> · <a href="file:///Users/daraprostova/Desktop/medical%20twsts/%D0%9F%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D0%B5%20%E2%80%94%20%D0%94%D0%B0%D1%88%D0%B0.pdf" target="_blank">Питание — Даша.pdf</a></span></div>
+      <h3>Задачи</h3>
+      <div class="task milestone"><input type="checkbox" id="g4"><label for="g4">Устойчивая рутина здоровья и работы — держится сама</label></div>
+      <div class="task"><input type="checkbox" id="t10"><label for="t10">Анализы и проверка после лечения — записаться на конкретные даты<small>Включая ферритин: цель &gt;50</small></label></div>
+      <div class="task"><input type="checkbox" id="hl1"><label for="hl1">Первая неделя тренировок: A вт · B чт · C сб — лёгкие веса, техника</label></div>
+      <div class="task"><input type="checkbox" id="t12"><label for="t12">Структура питания: основные приёмы + заранее выбранные перекусы</label></div>
+      <div class="task"><input type="checkbox" id="hl2"><label for="hl2">Вс: готовить белковую еду на неделю</label></div>
+      <div class="task"><input type="checkbox" id="w13"><label for="w13">Без алкоголя — правило эксперимента до 31.08</label></div>
+      <div class="task"><input type="checkbox" id="hl3"><label for="hl3">Перепроверить ферритин через 6–8 недель после капельницы</label></div>
+    </div>
+  </details>
+
+  <!-- 4 · Люди и дружба -->
+  <details class="stage" data-sec="people" data-title="Люди и дружба" data-line="Селективное окружение · комьюнити · социальная реализация">
+    <summary><span class="s-title">Люди и дружба</span><span class="s-pct"></span></summary>
+    <div class="stage-body">
+      <div class="vision">Не «войти в тусовку», а строить своё окружение селективно: сильные люди, друзья рядом, поле, в котором хочется расти.</div>
+      <div class="task"><input type="checkbox" id="m9"><label for="m9">Короткий список людей и пространств, в поле которых хочу быть</label></div>
+      <div class="task"><input type="checkbox" id="m10"><label for="m10">Познакомиться или восстановить контакт с 3–5 людьми</label></div>
+      <div class="task"><input type="checkbox" id="m11"><label for="m11">Два события вне привычной йога-тусовки</label></div>
+      <div class="task"><input type="checkbox" id="m12"><label for="m12">Предложить одну совместную идею вдохновляющему человеку</label></div>
+      <div class="task"><input type="checkbox" id="pp1"><label for="pp1">Один блок в неделю на расширение: встреча, знакомство, лекция</label></div>
+      <div class="task"><input type="checkbox" id="l7"><label for="l7">Долгосрок: окружение сильных людей, выстроенное селективно</label></div>
+    </div>
+  </details>
+
+  <!-- 5 · США -->
+  <details class="stage" data-sec="usa" data-title="Поездка в США" data-line="Виза · бюджет · разведка международного направления">
+    <summary><span class="s-title">Поездка в США</span><span class="s-pct"></span></summary>
+    <div class="stage-body">
+      <div class="vision">Не просто отпуск — первая разведка международного wellbeing-комьюнити, партнёрств и событий. Без превращения каждого дня в работу.</div>
+      <div class="task milestone"><input type="checkbox" id="g5"><label for="g5">Поездка подготовлена: виза, даты, бюджет, план</label></div>
+      <div class="task"><input type="checkbox" id="t13"><label for="t13">Подготовка к визе</label></div>
+      <div class="task"><input type="checkbox" id="t14"><label for="t14">Определить предполагаемые даты</label></div>
+      <div class="task"><input type="checkbox" id="t15"><label for="t15">Выбрать 2–3 города или главные цели поездки</label></div>
+      <div class="task"><input type="checkbox" id="t16"><label for="t16">Посчитать полный бюджет (внести в таблицу «Финансы»)</label></div>
+      <div class="task"><input type="checkbox" id="t17"><label for="t17">Решить, сколько нужно заработать до бронирования</label></div>
+      <div class="task"><input type="checkbox" id="us1"><label for="us1">Список мест и людей для разведки: студии, комьюнити, события</label></div>
+    </div>
+  </details>
+
+  <!-- 6 · Дом и образ жизни -->
+  <details class="stage" data-sec="home" data-title="Дом и образ жизни" data-line="Критерии · ритм поиска · жизнь, которую дом поддерживает">
+    <summary><span class="s-title">Дом и образ жизни</span><span class="s-pct"></span></summary>
+    <div class="stage-body">
+      <div class="vision">Большой дом, рассветный свет, трава босиком, красивое пространство, друзья рядом. Дом должен поддерживать жизнь, а не быть отдельным проектом тревоги.</div>
+      <div class="task milestone"><input type="checkbox" id="g6"><label for="g6">Понимание, какой дом и образ жизни я создаю дальше</label></div>
+      <div class="task"><input type="checkbox" id="m13"><label for="m13">Критерии дома: бюджет, район, свет, природа, место для работы, тренировки, близость друзей</label></div>
+      <div class="task"><input type="checkbox" id="m14"><label for="m14">Ритм поиска: просмотр предложений 2 раза в неделю + живые просмотры<small>Вместо того чтобы думать о доме постоянно</small></label></div>
+      <div class="task"><input type="checkbox" id="l6"><label for="l6">Долгосрок: новый дом по своим критериям</label></div>
+      <div class="task"><input type="checkbox" id="l8"><label for="l8">Долгосрок: жизнь целиком — семья, путешествия, практика, свобода</label></div>
+    </div>
+  </details>
+
+  <!-- 7 · Познание себя -->
+  <details class="stage" data-sec="know" data-title="Познание себя" data-line="Цикл и энергия · что своё, что навязанное · итоги эксперимента">
+    <summary><span class="s-title">Познание себя</span><span class="s-pct"></span></summary>
+    <div class="stage-body">
+      <div class="vision">Лето — эксперимент. Наблюдаю за собой без оценок: что реально двигает, что даёт энергию, что оказалось чужим.</div>
+      <div class="task"><input type="checkbox" id="w12"><label for="w12">Ежедневный трекинг: цикл, энергия, что дало/забрало (вкладка «Сегодня»)</label></div>
+      <div class="task"><input type="checkbox" id="kn1"><label for="kn1">Первые два цикла — просто наблюдение, без подгонки под описания фаз</label></div>
+      <div class="task"><input type="checkbox" id="kn2"><label for="kn2">Раз в месяц: перечитать ревизии, выписать 3 инсайта о себе</label></div>
+      <h3>Итоги эксперимента · к 31.08</h3>
+      <div class="task"><input type="checkbox" id="a3"><label for="a3">Какое позиционирование стало ощущаться своим?</label></div>
+      <div class="task"><input type="checkbox" id="a4"><label for="a4">Что происходило с энергией и циклом?</label></div>
+      <div class="task"><input type="checkbox" id="a5"><label for="a5">Работает ли недельный ритм?</label></div>
+      <div class="task"><input type="checkbox" id="a6"><label for="a6">Какие действия двигали, какие цели были навязаны?</label></div>
+    </div>
+  </details>
+
+  <div class="backup">
+    <button class="ghost" id="export-btn">Скачать резервную копию</button>
+    <label class="ghost" style="cursor:pointer;">Восстановить из копии<input type="file" id="import-file" accept=".json" style="display:none;"></label>
+  </div>
+  <p class="hint">Все данные хранятся в браузере на этом компьютере. Раз в пару недель скачивай копию.</p>
+</section>
+
+<!-- ════════════════ MANIFEST ════════════════ -->
+<section class="page" id="page-manifest">
+  <div class="page-head">
+    <div><div class="sec-label">с этим сверяется всё остальное</div><h2>компас</h2></div>
+  </div>
+  <div class="desc">выжимка большого разговора о себе. это не задачи — это то, куда я иду.</div>
+
+  <div class="star">
+    <div class="sec-label">кто я</div>
+    <p>я — архитектор опыта. я создаю значимые 360°-опыты на стыке wellbeing, движения, созерцания, творчества и человеческой трансформации: придумываю концепцию, собираю и веду команду, выстраиваю стратегию, визуальный язык, продвижение — и провожу человека через глубокий опыт. йога — одна из моих граней, не вся я.</p>
+    <div class="verbs"><span>создавать</span><span>собирать</span><span>соединять</span><span>проектировать</span><span>расширяться</span><span>исследовать</span><span>организовывать</span><span>вести</span><span>вдохновлять</span></div>
+  </div>
+
+  <div class="card">
+    <h3>что меня по-настоящему драйвит</h3>
+    <p class="manifest-p">не проведение класса — создание опыта целиком, от идеи до последней детали: концепция, смыслы, команда, пространство, визуал, музыка, запах, продвижение, путь человека внутри. я делала это во всех больших проектах своей жизни — sektaschool, nike, soft power. менялась только форма.</p>
+  </div>
+
+  <div class="card">
+    <h3>главный вопрос этого лета</h3>
+    <p class="manifest-p">не «как больше зарабатывать» и не «как масштабировать soft power», а:<br><em style="font-family:Georgia,serif;font-size:16px;">как собрать все мои сильные стороны в одну понятную профессиональную идентичность — и построить вокруг неё жизнь и систему.</em></p>
+  </div>
+
+  <div class="card">
+    <h3>каким человеком я хочу стать</h3>
+    <p class="manifest-p">человек, который создаёт значимые международные проекты на стыке well-being, longevity и biohacking. сотрудничает с крупными компаниями, выступает, ведёт сильную команду, делает вещи мирового уровня. и при этом живёт красивую, устойчивую, наполненную жизнь: семья, любимое дело, здоровье, путешествия, сильное окружение, духовная практика, материальное благополучие, свобода.</p>
+  </div>
+
+  <div class="card">
+    <h3>образ жизни</h3>
+    <p class="manifest-p">для меня важны семья и профессиональная самореализация. деньги — очень важны, но не как сама цель, а как следствие того, что я занимаюсь тем, что мне действительно интересно, и делаю мир лучше. у меня большой, светлый и красивый дом. семья и друзья рядом. у меня глубокий контакт с природой. вокруг меня красивые пространства. я здорова. у меня красивое спортивное тело и регулярная сексуальная жизнь. у меня классные ресурсные отношения и отличный баланс духовного и материального.</p>
+  </div>
+
+  <div class="card">
+    <h3>правила этого лета</h3>
+    <div class="rule"><b>1</b><span>не чинить всю жизнь сразу — до 31 августа строим опоры и запускаем новую профессиональную версию себя.</span></div>
+    <div class="rule"><b>2</b><span>только три приоритета: деньги и роль · здоровье и энергия · среда и структура. остальное не превращается в двадцать проектов.</span></div>
+    <div class="rule"><b>3</b><span>важное не планируется «когда появится настроение» — оно стоит в календаре заранее.</span></div>
+    <div class="rule"><b>4</b><span>не больше трёх главных результатов на неделю.</span></div>
+    <div class="rule"><b>5</b><span>30 тыс. € в месяц — стратегическая цель: этим летом строим путь к цифре, а не саму цифру.</span></div>
+    <div class="rule"><b>6</b><span>сайт переписывается на основании ясности — а не ради поиска ясности.</span></div>
+    <div class="rule"><b>7</b><span>окружение строится селективно. не «войти в тусовку», а выбрать своё поле.</span></div>
+    <div class="rule"><b>8</b><span>первые два цикла — наблюдение за собой без оценок и подгонки под чужие описания.</span></div>
+    <div class="rule"><b>9</b><span>разгрузка каждую 4-ю неделю и в пмс — часть плана, а не слабость. не до отказа, бережно к восстановлению.</span></div>
+    <div class="rule"><b>10</b><span>кейсы выписываются не для сайта — чтобы присвоить опыт, который уже есть.</span></div>
+  </div>
+
+  <div class="card">
+    <h3>вопрос для любой развилки</h3>
+    <p class="manifest-p">это действие приближает меня к новой жизни — или просто занимает внимание?</p>
+  </div>
+</section>
+
+<footer>не настроение решает — решает ритм.</footer>
+
+</div>
+
+<script>
+(function(){
+  /* ═══ utils ═══ */
+  var S={
+    get:function(k,d){try{var v=JSON.parse(localStorage.getItem(k));return (v===null||v===undefined)?d:v;}catch(e){return d;}},
+    set:function(k,v){localStorage.setItem(k,JSON.stringify(v));}
+  };
+  function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function parse(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+  function todayISO(){return iso(new Date());}
+  function fmt(s){var p=s.split('-');return p[2]+'.'+p[1];}
+  function fmtY(s){var p=s.split('-');return p[2]+'.'+p[1]+'.'+p[0];}
+  function addDays(s,n){var d=parse(s);d.setDate(d.getDate()+n);return iso(d);}
+  function diffDays(a,b){return Math.round((parse(b)-parse(a))/86400000);}
+  function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+  var MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  var MONTHS_N=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  var DAYS=['вс','пн','вт','ср','чт','пт','сб'];
+  var TODAY=todayISO();
+
+  /* ═══ tabs ═══ */
+  var tabs=document.querySelectorAll('.tab');
+  function showPage(p){
+    tabs.forEach(function(t){t.classList.toggle('active',t.dataset.page===p);});
+    document.querySelectorAll('.page').forEach(function(s){s.classList.toggle('active',s.id==='page-'+p);});
+    S.set('dd.tab',p); window.scrollTo(0,0);
+    if(p==='weekly'&&window.__growWF)window.__growWF();
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){showPage(t.dataset.page);});});
+  var savedTab=S.get('dd.tab','manifest');
+  if(['manifest','compass','daily','weekly','biweekly','monthly'].indexOf(savedTab)<0)savedTab='manifest';
+  showPage(savedTab);
+
+  /* ═══ header ═══ */
+  (function(){
+    var d=new Date();
+    document.getElementById('today-str').textContent=d.getDate()+' '+MONTHS[d.getMonth()]+', '+DAYS[d.getDay()];
+    document.getElementById('cd-days').textContent=Math.max(0,diffDays(TODAY,'2026-08-31'));
+    document.getElementById('daily-title').textContent='Сегодня, '+d.getDate()+' '+MONTHS[d.getMonth()];
+  })();
+
+  /* ═══ compass checkboxes ═══ */
+  var checks=S.get('dd.checks',{});
+  document.querySelectorAll('#page-compass .task input[type=checkbox]').forEach(function(cb){
+    cb.checked=!!checks[cb.id];
+    cb.addEventListener('change',function(){
+      if(cb.checked)checks[cb.id]=true;else delete checks[cb.id];
+      S.set('dd.checks',checks); compassProgress();
+    });
+  });
+  function compassProgress(){
+    var total=0,done=0;
+    document.querySelectorAll('#page-compass details[data-sec]').forEach(function(sec){
+      var t=sec.querySelectorAll('.task input'),d=0;
+      t.forEach(function(c){if(c.checked)d++;});
+      total+=t.length;done+=d;
+      sec.querySelector('.s-pct').textContent=d+'/'+t.length;
+      var card=document.getElementById('ccard-'+sec.dataset.sec);
+      if(card){
+        var pc=t.length?Math.round(d/t.length*100):0;
+        card.querySelector('.bar i').style.width=pc+'%';
+        card.querySelector('.cpct').textContent=d+' из '+t.length+' · '+pc+'%';
+      }
+    });
+    document.getElementById('cd-total').textContent=(total?Math.round(done/total*100):0)+'%';
+    renderMonthProgress();
+  }
+  /* compass overview grid */
+  (function(){
+    var grid=document.getElementById('compass-grid');
+    document.querySelectorAll('#page-compass details[data-sec]').forEach(function(sec){
+      var b=document.createElement('button'); b.className='ccard'; b.id='ccard-'+sec.dataset.sec;
+      b.innerHTML='<b>'+sec.dataset.title+'</b><span class="cline">'+sec.dataset.line+'</span><div class="bar"><i></i></div><div class="cpct"></div>';
+      b.addEventListener('click',function(){
+        sec.open=true; sec.scrollIntoView({behavior:'smooth',block:'start'});
+      });
+      grid.appendChild(b);
+    });
+  })();
+
+  /* ═══ CYCLE — 13.07.2026 = день 17 → старт 27.06.2026 ═══ */
+  var cs=S.get('dd.cycleStart',null);
+  if(!cs||cs==='2026-06-28')S.set('dd.cycleStart','2026-06-27');
+  function cycleDayFor(dateISO){
+    var st=S.get('dd.cycleStart','2026-06-27');
+    var n=diffDays(st,dateISO)+1;
+    return n>0?n:null;
+  }
+  function renderCycle(){
+    var n=cycleDayFor(TODAY);
+    document.getElementById('cycle-day').textContent=n||'—';
+    var st=S.get('dd.cycleStart','2026-06-27');
+    var hint='Начало цикла: '+fmtY(st)+'.';
+    if(n&&n>40)hint+=' Уже '+n+' дней — если начался новый цикл, отметь кнопкой в день его начала.';
+    document.getElementById('cycle-hint').textContent=hint;
+  }
+  document.getElementById('new-cycle').addEventListener('click',function(){
+    if(confirm('Отметить сегодня как первый день нового цикла?')){
+      S.set('dd.cycleStart',TODAY); renderCycle(); renderBody(); saveDailyField('cycle',1); renderDailyHistory();
+    }
+  });
+  renderCycle();
+
+  /* ═══ ТЕЛО СЕГОДНЯ ═══ */
+  function cyclePhase(n){
+    if(!n)return null;
+    if(n<=5)return{name:'Менструальная (дни 1–5)',
+      train:'Мягко: йога, мобилити, ходьба. Отдых — это ок.',
+      food:'Железо + витамин C: мясо/бобовые, зелень, перец, киви. Тёплая простая еда.'};
+    if(n<=13)return{name:'Фолликулярная (дни 6–13) ★ главные силовые недели',
+      train:'Лучшее время добавлять вес и повторы. Но не до отказа — RIR 2–3.',
+      food:'Чуть больше углеводов вокруг тренировок (крупы, фрукты). Белок высоко.'};
+    if(n<=15)return{name:'Овуляция (~13–15)',
+      train:'Можно сильно, но техника чистая, без рекордов — связки слабее.',
+      food:'Антиоксиданты: овощи, ягоды, рыба. Держим белок.'};
+    if(n<=23)return{name:'Ранняя лютеиновая (дни 16–23)',
+      train:'Умеренно: уверенное усилие, объём чуть меньше, больше сна. К 24-му дню плавно снижай веса.',
+      food:'Аппетит растёт — не режь: добери белком и объёмными овощами, клетчаткой.'};
+    return{name:'ПМС (дни 24–28) · разгрузка',
+      train:'Всё −40%: лёгкие веса, йога, прогулки. Сон в приоритете.',
+      food:'Магний вечером, стабильный сахар: тыквенные семечки, зелень, тёмный шоколад. +5–10% ккал — норма.'};
+  }
+  /* силовые: вт A · чт B · сб C (старт 14.07) */
+  var TRAIN_WEEK=[
+    'Отдых. Приготовить белковую еду на неделю',        /* вс */
+    'Йога + прогулка 30–40 мин',                        /* пн */
+    'Силовая A · низ тела: ягодицы и ноги',             /* вт */
+    'Йога + спокойный сайкл (по желанию)',              /* ср */
+    'Силовая B · верх тела: спина, плечи, руки',        /* чт */
+    'Йога / мобилити',                                  /* пт */
+    'Силовая C · всё тело + ягодицы'                    /* сб */
+  ];
+  function renderBody(){
+    var n=cycleDayFor(TODAY), ph=cyclePhase(n), dow=new Date().getDay();
+    var t=TRAIN_WEEK[dow];
+    if(TODAY<'2026-07-14')t='Старт тренировок завтра, 14.07 (вт) — силовая A. Сегодня йога/прогулка по желанию';
+    else if(ph&&(n<=5||n>=24))t+=' — в эту фазу легче, без героизма';
+    document.getElementById('body-train').textContent=t;
+    document.getElementById('body-phase').textContent=ph?'День '+n+' · '+ph.name:'Отметь начало цикла, чтобы видеть фазу';
+    document.getElementById('body-food').textContent=(ph?ph.food+' ':'')+'База: белок 95–120 г, 1900–2100 ккал.';
+  }
+  renderBody();
+
+  /* ═══ DAILY ═══ */
+  var daily=S.get('dd.daily2',{});
+  function dayRec(dateISO){
+    if(!daily[dateISO])daily[dateISO]={energy:'',sleep:'',gave:'',took:'',habits:{},tasks:[],cycle:cycleDayFor(dateISO)};
+    if(!daily[dateISO].cycle)daily[dateISO].cycle=cycleDayFor(dateISO);
+    return daily[dateISO];
+  }
+  function saveDaily(){S.set('dd.daily2',daily);}
+  function saveDailyField(f,v){var r=dayRec(TODAY);r[f]=v;saveDaily();renderDailyHistory();}
+
+  var eBtns=document.querySelectorAll('#energy-dots button');
+  function paintEnergy(v){eBtns.forEach(function(b){b.classList.toggle('on',+b.dataset.v<=+v);});}
+  eBtns.forEach(function(b){b.addEventListener('click',function(){
+    var r=dayRec(TODAY);
+    r.energy=(r.energy==b.dataset.v)?'':b.dataset.v;
+    paintEnergy(r.energy||0); saveDaily(); renderDailyHistory();
+  });});
+
+  var dSleep=document.getElementById('d-sleep'), dGave=document.getElementById('d-gave'), dTook=document.getElementById('d-took');
+  dSleep.addEventListener('change',function(){saveDailyField('sleep',dSleep.value);});
+  dGave.addEventListener('change',function(){saveDailyField('gave',dGave.value.trim());});
+  dTook.addEventListener('change',function(){saveDailyField('took',dTook.value.trim());});
+
+  /* habits — v3 */
+  var habits=S.get('dd.habits',null);
+  var OLD_DEFAULTS=[
+    'Движение / тренировка','Питание по структуре, без хаос-перекусов','Без алкоголя','Практика: дыхание, медитация или тишина',
+    'Эутирокс натощак · еда и кофе через 30–60 мин','Белок 3–4 раза по 25–35 г','Движение по плану дня (силовая / йога / прогулка)','~2 л воды','Практика: дыхание, медитация или тишина'
+  ];
+  if(habits&&habits.length&&habits.every(function(h){return OLD_DEFAULTS.indexOf(h.name)>-1;}))habits=null;
+  if(!habits){habits=[
+    {id:'h1',name:'Добрала белка (3–4 приёма по 25–35 г)'},
+    {id:'h2',name:'Движение по плану дня'},
+    {id:'h3',name:'Без алкоголя'},
+    {id:'h4',name:'Зарядка: дыхание · медитация · разминка'}
+  ]; S.set('dd.habits',habits);}
+  var habitList=document.getElementById('habit-list');
+  function renderHabits(){
+    var r=dayRec(TODAY);
+    habitList.innerHTML='';
+    habits.forEach(function(h){
+      var div=document.createElement('div');div.className='task';
+      div.innerHTML='<input type="checkbox" id="hb-'+h.id+'"><label for="hb-'+h.id+'">'+esc(h.name)+'</label><button class="x" title="убрать">×</button>';
+      var cb=div.querySelector('input');
+      cb.checked=!!r.habits[h.id];
+      cb.addEventListener('change',function(){
+        var rr=dayRec(TODAY);
+        if(cb.checked)rr.habits[h.id]=true;else delete rr.habits[h.id];
+        saveDaily(); renderDailyHistory();
+      });
+      div.querySelector('.x').addEventListener('click',function(){
+        if(!confirm('Убрать «'+h.name+'» из опор?'))return;
+        habits=habits.filter(function(x){return x.id!==h.id;});
+        S.set('dd.habits',habits); renderHabits(); renderDailyHistory();
+      });
+      habitList.appendChild(div);
+    });
+  }
+  document.getElementById('add-habit').addEventListener('click',addHabit);
+  document.getElementById('new-habit').addEventListener('keydown',function(e){if(e.key==='Enter')addHabit();});
+  function addHabit(){
+    var inp=document.getElementById('new-habit'),v=inp.value.trim();if(!v)return;
+    habits.push({id:'h'+Date.now(),name:v}); S.set('dd.habits',habits); inp.value=''; renderHabits();
+  }
+  renderHabits();
+
+  /* daily tasks */
+  var dtaskList=document.getElementById('dtask-list');
+  function renderDTasks(){
+    var r=dayRec(TODAY);
+    dtaskList.innerHTML=r.tasks.length?'':'<div class="hint">Пока пусто — добавь 1–3 шага на сегодня</div>';
+    r.tasks.forEach(function(t,i){
+      var div=document.createElement('div');div.className='task';
+      div.innerHTML='<input type="checkbox" id="dt-'+i+'"><label for="dt-'+i+'" class="t-text">'+esc(t.t)+'</label><button class="x">×</button>';
+      var cb=div.querySelector('input');cb.checked=!!t.done;
+      cb.addEventListener('change',function(){t.done=cb.checked;saveDaily();});
+      div.querySelector('.x').addEventListener('click',function(){r.tasks.splice(i,1);saveDaily();renderDTasks();});
+      dtaskList.appendChild(div);
+    });
+  }
+  document.getElementById('add-dtask').addEventListener('click',addDTask);
+  document.getElementById('new-dtask').addEventListener('keydown',function(e){if(e.key==='Enter')addDTask();});
+  function addDTask(){
+    var inp=document.getElementById('new-dtask'),v=inp.value.trim();if(!v)return;
+    dayRec(TODAY).tasks.push({t:v,done:false}); saveDaily(); inp.value=''; renderDTasks();
+  }
+  renderDTasks();
+
+  function renderDailyHistory(){
+    var tb=document.getElementById('daily-history');
+    var keys=Object.keys(daily).sort().reverse().slice(0,14);
+    tb.innerHTML='';
+    if(!keys.length){tb.innerHTML='<tr><td colspan="6" style="color:var(--faint)">Записи появятся по мере заполнения</td></tr>';return;}
+    keys.forEach(function(k){
+      var e=daily[k];
+      var hd=Object.keys(e.habits||{}).length;
+      var pm=[];
+      if(e.gave)pm.push('+ '+esc(e.gave));
+      if(e.took)pm.push('− '+esc(e.took));
+      if(e.note)pm.push(esc(e.note));
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td>'+fmt(k)+'</td><td>'+(e.cycle||'—')+'</td>'
+        +'<td>'+(e.energy?'●'.repeat(+e.energy)+'○'.repeat(5-e.energy):'—')+'</td>'
+        +'<td>'+(e.sleep||'—')+'</td><td>'+(hd?hd+'/'+habits.length:'—')+'</td>'
+        +'<td>'+pm.join('<br>')+'</td>';
+      tb.appendChild(tr);
+    });
+  }
+  (function(){
+    var r=dayRec(TODAY);
+    paintEnergy(r.energy||0);
+    dSleep.value=r.sleep||''; dGave.value=r.gave||''; dTook.value=r.took||'';
+    saveDaily();
+  })();
+  renderDailyHistory();
+
+  /* ═══ WEEKLY — предзаполненные недели из летней стратегии ═══ */
+  var WEEK_PLANS={
+    '2026-07-13':{theme:'Исходная точка: люди, август, запуск ритма',
+      note:'Собрать факты, запустить продажи августа и тело по плану. Не оценивать себя — двигать конкретное.',
+      f1:'Расписание йоги на август готово — к концу недели стартуют продажи абонементов',
+      f2:'Финансовая картина заполнена + квартира выставлена в саблет',
+      f3:'Старт тренировок (A вт · B чт · C сб) и питания по плану',
+      tasks:['Звонок со Славой — ADHD-проект','Встреча с Ирой Зеленковой — новые партнёрства','Провести все запланированные йога-практики','Засетапить новый ивент на Океане','Засаблетить квартиру: объявление + показы','Составить расписание йоги на август','Запустить продажи абонементов на август (к концу недели)','Посчитать средний доход за 6 месяцев, минимум и комфорт','Забить в календарь ревизию ПН и рабочие блоки','Вт: силовая A · Чт: силовая B · Сб: силовая C — лёгкие веса, техника','Питание по плану: белок 3–4 раза, тарелка ½ овощи','Каждый день отмечать энергию и что её дало/забрало']},
+    '2026-07-20':{theme:'Профессиональное ядро',
+      note:'Присвоить свой опыт: кейсы — это не для сайта, это чтобы ты сама увидела масштаб уже сделанного.',
+      f1:'5–7 кейсов выписаны: задача, роль, масштаб, результат, фото',
+      f2:'Корзины дохода заполнены: где сейчас, где цель 30 000 €',
+      f3:'Анализы и проверка после лечения — записаться на даты',
+      tasks:['Выписать кейсы: Sektaschool, Nike, Soft Power, ретриты, события','Собрать фото и видео по кейсам','Заполнить корзины дохода в Ориентирах','Запустить правило подушки: фикс-доля с каждого поступления','Записаться на анализы (ферритин — цель >50)','Вторая неделя тренировок: +1–2 повтора, веса не гнать']},
+    '2026-07-27':{theme:'Один продукт вне йоги',
+      note:'Не строить компанию — протестировать один платный формат на реальных людях.',
+      f1:'Продукт выбран и описан: какой результат получает клиент',
+      f2:'Отправлены первые 3 предложения потенциальным заказчикам',
+      f3:'Ритм тренировок держится, питание по фазе',
+      tasks:['Выбрать формат: консалтинг / корпоративный wellbeing / событие под ключ / стратсессия','Написать одностраничное описание продукта','Составить список первых 10 потенциальных клиентов','Отправить 3 предложения','США: определить даты и 2–3 города']},
+    '2026-08-03':{theme:'Контакт с рынком и новый публичный образ',
+      note:'Получить контакт с реальностью: что откликается, за что готовы платить.',
+      f1:'2–3 разговора с потенциальными клиентами проведены',
+      f2:'Instagram: новое био + закреплённый пост о профессиональном пути',
+      f3:'Одно событие вне йога-тусовки',
+      tasks:['Разговоры: записывать, за что готовы платить и какими словами описывают ценность','Обновить описание Instagram','Закреп о пути: Nike, Sektaschool, Soft Power','Сходить на событие вне привычного круга','США: полный бюджет и сумма до бронирования']},
+    '2026-08-10':{theme:'Пилот и окружение',
+      note:'Первая платная или пилотная работа — главное событие лета. Плюс селективное окружение.',
+      f1:'Первая платная или пилотная работа проведена',
+      f2:'Разговоров накоплено 5 — вывод: за что платят',
+      f3:'Контакт с 2–3 людьми из списка окружения',
+      tasks:['Провести пилот и взять обратную связь','Список людей и пространств, в поле которых хочу быть','Восстановить контакт с 2–3 людьми','Дом: зафиксировать критерии','Дом: 2 сессии просмотра предложений']},
+    '2026-08-17':{theme:'Закрепление',
+      note:'Дожать открытое, подготовить почву для итогов.',
+      f1:'Вторая продажа или подтверждённый интерес',
+      f2:'США: виза и план поездки готовы',
+      f3:'Дом: живые просмотры',
+      tasks:['Дожать открытые предложения','Предложить совместную идею вдохновляющему человеку','Второе событие вне йога-тусовки','Живые просмотры жилья','Перечитать ревизии — что говорят данные']},
+    '2026-08-24':{theme:'Итоги эксперимента',
+      note:'Честно свести лето и выбрать ОДИН большой проект на осень.',
+      f1:'Ответы на вопросы итогов (Ориентиры → Познание себя)',
+      f2:'Свести цифры: доход вне классов за лето',
+      f3:'Выбран осенний проект + набросок плана сентября',
+      tasks:['Свести доход вне регулярных классов','Что ощущается своим, что навязано — выписать','Выбрать осенний проект из шорт-листа','Набросать план сентября','Отпраздновать завершение эксперимента']}
+  };
+  function mondayOf(dateISO){
+    var d=parse(dateISO); var shift=(d.getDay()+6)%7; d.setDate(d.getDate()-shift); return iso(d);
+  }
+  var weeks=S.get('dd.weeks',{});
+  var wkOffset=0;
+  function curMonday(){return addDays(mondayOf(TODAY),wkOffset*7);}
+  var PLAN_V=2;
+  /* прежние формулировки недели 13.07 — чтобы обновить их, если ты их не меняла */
+  var OLD_F_1307={
+    f1:['Финансовая картина заполнена (Компас → Финансы): доход, минимум, накопления','Финансовая картина заполнена (Ориентиры → Финансы): доход, минимум, накопления'],
+    f2:['Ритм в календаре: ревизия ПН, 2 глубоких блока, блок денег, блок расширения'],
+    f3:['Старт тренировок со вторника (A вт · B чт · C сб) + ежедневный трекинг']
+  };
+  function weekRec(mon){
+    if(!weeks[mon])weeks[mon]={f1:'',f2:'',f3:'',f1d:false,f2d:false,f3d:false,tasks:[],review:null,seeded:false};
+    var w=weeks[mon];
+    var plan=WEEK_PLANS[mon];
+    if(plan&&!w.seeded){
+      if(!w.f1)w.f1=plan.f1;
+      if(!w.f2)w.f2=plan.f2;
+      if(!w.f3)w.f3=plan.f3;
+      var have={}; w.tasks.forEach(function(t){have[t.t]=1;});
+      plan.tasks.forEach(function(t){if(!have[t])w.tasks.push({t:t,done:false});});
+      w.seeded=true; w.planV=PLAN_V;
+    }
+    /* докатить обновления плана на уже сохранённую неделю */
+    if(plan&&w.seeded&&(w.planV||1)<PLAN_V){
+      if(mon==='2026-07-13'){
+        ['f1','f2','f3'].forEach(function(f){
+          if(!w[f]||OLD_F_1307[f].indexOf(w[f])>-1)w[f]=plan[f];
+        });
+      }
+      var have2={}; w.tasks.forEach(function(t){have2[t.t]=1;});
+      plan.tasks.forEach(function(t){if(!have2[t])w.tasks.push({t:t,done:false});});
+      w.planV=PLAN_V;
+    }
+    return w;
+  }
+  function saveWeeks(){S.set('dd.weeks',weeks);}
+
+  var wf=['f1','f2','f3'];
+  function autoGrow(el){el.style.height='auto';el.style.height=(el.scrollHeight||0)+'px';}
+  window.__growWF=function(){wf.forEach(function(f){autoGrow(document.getElementById('w'+f));});};
+  function renderWeek(){
+    var mon=curMonday(), w=weekRec(mon), plan=WEEK_PLANS[mon];
+    saveWeeks();
+    var sun=addDays(mon,6);
+    document.getElementById('wk-range').textContent=fmt(mon)+' – '+fmt(sun)+(wkOffset===0?' · эта неделя':'');
+    document.getElementById('wk-theme').textContent=plan?plan.theme:'Свободная неделя';
+    document.getElementById('wk-theme-note').textContent=plan?plan.note:'Выбери фокус сама: один профессиональный результат, один финансовый шаг, одна опора.';
+    wf.forEach(function(f){
+      var inp=document.getElementById('w'+f), cb=document.getElementById('w'+f+'d');
+      inp.value=w[f]||''; cb.checked=!!w[f+'d'];
+      autoGrow(inp);
+      inp.oninput=function(){autoGrow(inp);};
+      inp.onchange=function(){w[f]=inp.value.trim();saveWeeks();};
+      cb.onchange=function(){w[f+'d']=cb.checked;saveWeeks();};
+    });
+    var list=document.getElementById('wtask-list');
+    list.innerHTML=w.tasks.length?'':'<div class="hint">Добавь задачи и события недели</div>';
+    w.tasks.forEach(function(t,i){
+      var div=document.createElement('div');div.className='task';
+      div.innerHTML='<input type="checkbox" id="wt-'+i+'"><label for="wt-'+i+'" class="t-text">'+esc(t.t)+'</label><button class="x">×</button>';
+      var cb=div.querySelector('input');cb.checked=!!t.done;
+      cb.addEventListener('change',function(){t.done=cb.checked;saveWeeks();});
+      div.querySelector('.x').addEventListener('click',function(){w.tasks.splice(i,1);saveWeeks();renderWeek();});
+      list.appendChild(div);
+    });
+    ['rq1','rq2','rq3','rq4'].forEach(function(id,i){
+      document.getElementById(id).value=(w.review&&w.review['q'+(i+1)])||'';
+    });
+    document.getElementById('review-saved').textContent=w.review?'  сохранена '+fmtY(w.review.savedAt):'';
+    renderWeekHistory();
+  }
+  document.getElementById('wk-prev').addEventListener('click',function(){wkOffset--;renderWeek();});
+  document.getElementById('wk-next').addEventListener('click',function(){wkOffset++;renderWeek();});
+  document.getElementById('add-wtask').addEventListener('click',addWTask);
+  document.getElementById('new-wtask').addEventListener('keydown',function(e){if(e.key==='Enter')addWTask();});
+  function addWTask(){
+    var inp=document.getElementById('new-wtask'),v=inp.value.trim();if(!v)return;
+    weekRec(curMonday()).tasks.push({t:v,done:false}); saveWeeks(); inp.value=''; renderWeek();
+  }
+  document.getElementById('save-review').addEventListener('click',function(){
+    var w=weekRec(curMonday());
+    w.review={
+      q1:document.getElementById('rq1').value.trim(),
+      q2:document.getElementById('rq2').value.trim(),
+      q3:document.getElementById('rq3').value.trim(),
+      q4:document.getElementById('rq4').value.trim(),
+      savedAt:TODAY
+    };
+    saveWeeks(); renderWeek();
+  });
+  function renderWeekHistory(){
+    var box=document.getElementById('week-history');
+    box.innerHTML='';
+    var mons=Object.keys(weeks).sort().reverse().filter(function(m){return m!==curMonday();}).slice(0,8);
+    if(!mons.length)return;
+    var h=document.createElement('div');h.className='sec-label';h.style.margin='26px 0 4px';h.textContent='Прошлые недели';box.appendChild(h);
+    mons.forEach(function(m){
+      var w=weeks[m], el=document.createElement('div'); el.className='entry';
+      var focuses=[['Профессия',w.f1,w.f1d],['Деньги',w.f2,w.f2d],['Опора',w.f3,w.f3d]]
+        .filter(function(x){return x[1];})
+        .map(function(x){return (x[2]?'✓ ':'— ')+x[0]+': '+esc(x[1]);}).join('\n');
+      var done=w.tasks.filter(function(t){return t.done;}).length;
+      el.innerHTML='<div class="e-head"><span>Неделя '+fmt(m)+' – '+fmt(addDays(m,6))+(WEEK_PLANS[m]?' · '+WEEK_PLANS[m].theme:'')+'</span><span class="deadline">'+(w.tasks.length?done+'/'+w.tasks.length+' задач':'')+'</span></div>'
+        +'<dl>'+(focuses?'<dt>Три результата</dt><dd>'+focuses+'</dd>':'')
+        +(w.review&&w.review.q2?'<dt>Что приблизило к новой жизни</dt><dd>'+esc(w.review.q2)+'</dd>':'')
+        +(w.review&&w.review.q3?'<dt>Куда ушло внимание впустую</dt><dd>'+esc(w.review.q3)+'</dd>':'')
+        +'</dl>';
+      box.appendChild(el);
+    });
+  }
+  renderWeek();
+
+  /* ═══ BIWEEKLY ═══ */
+  var SPRINTS=[
+    ['2026-07-13','2026-07-26','Спринт 1 · Исходная точка + профессиональное ядро','Финансовая картина, ритм, кейсы, старт тренировок (недели 13.07 и 20.07).'],
+    ['2026-07-27','2026-08-09','Спринт 2 · Продукт и контакт с рынком','Один продукт, первые предложения, разговоры, публичный образ.'],
+    ['2026-08-10','2026-08-23','Спринт 3 · Пилот, окружение, США, дом','Первая платная работа, люди, виза и бюджет, критерии дома.'],
+    ['2026-08-24','2026-08-31','Спринт 4 · Итоги эксперимента','Свести лето и выбрать один большой проект на осень.']
+  ];
+  function currentSprint(){
+    for(var i=0;i<SPRINTS.length;i++){if(TODAY>=SPRINTS[i][0]&&TODAY<=SPRINTS[i][1])return SPRINTS[i];}
+    var n=Math.floor(diffDays('2026-07-13',TODAY)/14);
+    var st=addDays('2026-07-13',n*14);
+    return [st,addDays(st,13),'Двухнедельный цикл','Сверка по трём приоритетам.'];
+  }
+  var SP=currentSprint();
+  document.getElementById('sprint-range').textContent=fmt(SP[0])+' – '+fmt(SP[1]);
+  document.getElementById('sprint-title').textContent=SP[2];
+  document.getElementById('sprint-desc').textContent=SP[3];
+  var bi=S.get('dd.bi',[]);
+  document.getElementById('save-bi').addEventListener('click',function(){
+    var r={date:TODAY,sprint:SP[2],range:fmt(SP[0])+' – '+fmt(SP[1]),
+      a1:document.getElementById('bq1').value.trim(),
+      a2:document.getElementById('bq2').value.trim(),
+      a3:document.getElementById('bq3').value.trim(),
+      a4:document.getElementById('bq4').value.trim()};
+    if(!(r.a1||r.a2||r.a3||r.a4)){alert('Заполни хотя бы одно поле');return;}
+    bi.push(r); S.set('dd.bi',bi);
+    ['bq1','bq2','bq3','bq4'].forEach(function(id){document.getElementById(id).value='';});
+    renderBi();
+  });
+  function renderBi(){
+    var box=document.getElementById('bi-history'); box.innerHTML='';
+    if(!bi.length)return;
+    var h=document.createElement('div');h.className='sec-label';h.style.margin='26px 0 4px';h.textContent='Прошлые сверки';box.appendChild(h);
+    bi.slice().reverse().forEach(function(r,i){
+      var idx=bi.length-1-i;
+      var el=document.createElement('div');el.className='entry';
+      el.innerHTML='<div class="e-head"><span>'+esc(r.sprint)+' · '+esc(r.range)+'</span><button class="ghost">удалить</button></div>'
+        +'<dl>'+(r.a1?'<dt>Продукт и позиционирование</dt><dd>'+esc(r.a1)+'</dd>':'')
+        +(r.a2?'<dt>Деньги</dt><dd>'+esc(r.a2)+'</dd>':'')
+        +(r.a3?'<dt>Здоровье и энергия</dt><dd>'+esc(r.a3)+'</dd>':'')
+        +(r.a4?'<dt>Убираю / меняю</dt><dd>'+esc(r.a4)+'</dd>':'')+'</dl>';
+      el.querySelector('button').addEventListener('click',function(){
+        if(!confirm('Удалить сверку?'))return;
+        bi.splice(idx,1);S.set('dd.bi',bi);renderBi();
+      });
+      box.appendChild(el);
+    });
+  }
+  renderBi();
+
+  /* ═══ MONTHLY ═══ */
+  (function(){var d=new Date();document.getElementById('month-name').textContent=MONTHS_N[d.getMonth()]+' '+d.getFullYear();})();
+  function renderMonthProgress(){
+    var box=document.getElementById('month-progress'); if(!box)return;
+    box.innerHTML='';
+    document.querySelectorAll('#page-compass details[data-sec]').forEach(function(sec){
+      var t=sec.querySelectorAll('.task input'),d=0;
+      t.forEach(function(c){if(c.checked)d++;});
+      var pc=t.length?Math.round(d/t.length*100):0;
+      var div=document.createElement('div');
+      div.innerHTML='<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:10px;"><span>'+sec.dataset.title+'</span><span style="color:var(--soft)">'+d+'/'+t.length+'</span></div><div class="bar" style="margin-top:5px;"><i style="width:'+pc+'%"></i></div>';
+      box.appendChild(div);
+    });
+  }
+  var mo=S.get('dd.mo',[]);
+  document.getElementById('save-mo').addEventListener('click',function(){
+    var d=new Date();
+    var r={date:TODAY,month:MONTHS_N[d.getMonth()]+' '+d.getFullYear(),
+      a1:document.getElementById('mq1').value.trim(),
+      a2:document.getElementById('mq2').value.trim(),
+      a3:document.getElementById('mq3').value.trim(),
+      a4:document.getElementById('mq4').value.trim()};
+    if(!(r.a1||r.a2||r.a3||r.a4)){alert('Заполни хотя бы одно поле');return;}
+    mo.push(r);S.set('dd.mo',mo);
+    ['mq1','mq2','mq3','mq4'].forEach(function(id){document.getElementById(id).value='';});
+    renderMo();
+  });
+  function renderMo(){
+    var box=document.getElementById('mo-history');box.innerHTML='';
+    if(!mo.length)return;
+    var h=document.createElement('div');h.className='sec-label';h.style.margin='26px 0 4px';h.textContent='Прошлые месяцы';box.appendChild(h);
+    mo.slice().reverse().forEach(function(r,i){
+      var idx=mo.length-1-i;
+      var el=document.createElement('div');el.className='entry';
+      el.innerHTML='<div class="e-head"><span>'+esc(r.month)+'</span><button class="ghost">удалить</button></div>'
+        +'<dl>'+(r.a1?'<dt>Главные результаты</dt><dd>'+esc(r.a1)+'</dd>':'')
+        +(r.a2?'<dt>Что не сработало</dt><dd>'+esc(r.a2)+'</dd>':'')
+        +(r.a3?'<dt>Расфокус / навязанное</dt><dd>'+esc(r.a3)+'</dd>':'')
+        +(r.a4?'<dt>Фокус следующего месяца</dt><dd>'+esc(r.a4)+'</dd>':'')+'</dl>';
+      el.querySelector('button').addEventListener('click',function(){
+        if(!confirm('Удалить сверку месяца?'))return;
+        mo.splice(idx,1);S.set('dd.mo',mo);renderMo();
+      });
+      box.appendChild(el);
+    });
+  }
+  renderMo();
+
+  /* ═══ FINANCE tables ═══ */
+  var fin=S.get('dd.fin',{});
+  document.querySelectorAll('input[data-fin]').forEach(function(inp){
+    var k=inp.dataset.fin;
+    if(fin[k]!==undefined&&fin[k]!=='')inp.value=fin[k];
+    inp.addEventListener('change',function(){
+      fin[k]=inp.value; S.set('dd.fin',fin); calcFin();
+    });
+  });
+  function calcFin(){
+    var min=+fin.min||0, avg=+fin.avg||0;
+    document.getElementById('fin-cushion').textContent=min?(min*6).toLocaleString('ru-RU')+' €':'—';
+    document.getElementById('fin-gap').textContent=avg?Math.max(0,30000-avg).toLocaleString('ru-RU')+' €':'—';
+  }
+  calcFin();
+
+  var BASKET_NAMES=['Преподавание и Soft Power','События и ретриты','Консалтинг','Корпоративные проекты','Партнёрства и выступления','Инвестиции (позже)'];
+  var baskets=S.get('dd.baskets',{});
+  (function(){
+    var tbl=document.getElementById('baskets');
+    BASKET_NAMES.forEach(function(name,i){
+      var b=baskets[i]||{now:'',goal:''};
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td>'+name+'</td><td style="text-align:right"><input type="number" placeholder="0" value="'+esc(b.now)+'"></td><td style="text-align:right"><input type="number" placeholder="0" value="'+esc(b.goal)+'"></td>';
+      var ins=tr.querySelectorAll('input');
+      ins[0].addEventListener('change',function(){baskets[i]=baskets[i]||{};baskets[i].now=ins[0].value;S.set('dd.baskets',baskets);calcBaskets();});
+      ins[1].addEventListener('change',function(){baskets[i]=baskets[i]||{};baskets[i].goal=ins[1].value;S.set('dd.baskets',baskets);calcBaskets();});
+      tbl.appendChild(tr);
+    });
+    var tr=document.createElement('tr');tr.className='calc';
+    tr.innerHTML='<td>Сумма</td><td style="text-align:right" id="bk-now">—</td><td style="text-align:right" id="bk-goal">—</td>';
+    tbl.appendChild(tr);
+  })();
+  function calcBaskets(){
+    var n=0,g=0;
+    BASKET_NAMES.forEach(function(_,i){var b=baskets[i]||{};n+=+b.now||0;g+=+b.goal||0;});
+    document.getElementById('bk-now').textContent=n?n.toLocaleString('ru-RU')+' €':'—';
+    var gt=document.getElementById('bk-goal');
+    gt.textContent=g?g.toLocaleString('ru-RU')+' € из 30 000':'—';
+  }
+  calcBaskets();
+  compassProgress();
+
+  /* ═══ backup ═══ */
+  document.getElementById('export-btn').addEventListener('click',function(){
+    var keys=['dd.checks','dd.daily2','dd.habits','dd.weeks','dd.bi','dd.mo','dd.cycleStart','dd.fin','dd.baskets'];
+    var data={exported:TODAY};
+    keys.forEach(function(k){data[k]=S.get(k,null);});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+    a.download='dream-destination-backup-'+TODAY+'.json'; a.click();
+  });
+  document.getElementById('import-file').addEventListener('change',function(){
+    var f=this.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var d=JSON.parse(r.result);
+        Object.keys(d).forEach(function(k){if(k.indexOf('dd.')===0&&d[k]!==null)S.set(k,d[k]);});
+        location.reload();
+      }catch(e){alert('Не удалось прочитать файл копии');}
+    };
+    r.readAsText(f);
+  });
+})();
+</script>
+</body>
+</html>
