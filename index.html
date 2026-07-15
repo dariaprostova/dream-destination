@@ -197,7 +197,7 @@
 
   <div class="card">
     <h3>Тело сегодня</h3>
-    <div class="note">Из твоих планов тренировок и питания — по дню недели и фазе цикла. Силовые: вт · чт · сб</div>
+    <div class="note">Из твоих планов тренировок и питания. Силовые через день: A → B → C (12.07 ноги → 14.07 руки → 16.07 всё тело → …)</div>
     <div class="brow"><span class="tag">Движение</span><span id="body-train"></span></div>
     <div class="brow"><span class="tag">Фаза</span><span id="body-phase"></span></div>
     <div class="brow"><span class="tag">Питание</span><span id="body-food"></span></div>
@@ -256,7 +256,7 @@
 
   <div class="card">
     <h3>Задачи недели</h3>
-    <div class="note">Предзаполнены из плана. Ритм тела: вт A · чт B · сб C · пн/ср йога · вс отдых + белковая еда на неделю</div>
+    <div class="note">Предзаполнены из плана. Ритм тела: силовые через день A → B → C, между ними йога и прогулки; вс — белковая еда на неделю</div>
     <div id="wtask-list"></div>
     <div class="adder"><input type="text" id="new-wtask" placeholder="добавить задачу или событие…"><button class="ghost" id="add-wtask">+</button></div>
   </div>
@@ -409,14 +409,14 @@
     <summary><span class="s-title">Здоровье</span><span class="s-pct"></span></summary>
     <div class="stage-body">
       <div class="vision">Энергия — фундамент всего плана. Не героизм, а бережная система под цикл, щитовидку и восстановление.</div>
-      <div class="brow"><span class="tag">Тренировки</span><span>3 силовые: вт A-низ · чт B-верх · сб C-всё тело (старт 14.07) + йога как восстановление. Не до отказа (RIR 2–3), 48 ч между силовыми, разгрузка каждую 4-ю неделю и в ПМС (−40%). Без HIIT и прыжков, бережём ахилл.</span></div>
+      <div class="brow"><span class="tag">Тренировки</span><span>3 силовые через день: A низ · B верх · C всё тело (12.07 → 14.07 → 16.07 → …) + йога как восстановление. Не до отказа (RIR 2–3), 48 ч между силовыми, разгрузка каждую 4-ю неделю и в ПМС (−40%). Без HIIT и прыжков, бережём ахилл.</span></div>
       <div class="brow"><span class="tag">Питание</span><span>1900–2100 ккал · белок 95–120 г (3–4 × 25–35 г) · клетчатка 25–30 г. Тарелка: ½ овощи, ¼ белок, ¼ сложные углеводы. Поддержка, не дефицит (Хашимото). Без длинных голоданий и йод-БАДов.</span></div>
       <div class="brow"><span class="tag">Приоритет</span><span>Железо: ферритин был 13.7 → цель &gt;50. Железо едой + витамин C, кофе не сразу после еды. Железо/кальций — не раньше 4 ч после Эутирокса.</span></div>
       <div class="brow doc-links"><span class="tag">Документы</span><span><a href="file:///Users/daraprostova/Desktop/medical%20twsts/%D0%A2%D1%80%D0%B5%D0%BD%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B8%20%E2%80%94%20%D0%94%D0%B0%D1%88%D0%B0.pdf" target="_blank">Тренировки — Даша.pdf</a> · <a href="file:///Users/daraprostova/Desktop/medical%20twsts/%D0%9F%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D0%B5%20%E2%80%94%20%D0%94%D0%B0%D1%88%D0%B0.pdf" target="_blank">Питание — Даша.pdf</a></span></div>
       <h3>Задачи</h3>
       <div class="task milestone"><input type="checkbox" id="g4"><label for="g4">Устойчивая рутина здоровья и работы — держится сама</label></div>
       <div class="task"><input type="checkbox" id="t10"><label for="t10">Анализы и проверка после лечения — записаться на конкретные даты<small>Включая ферритин: цель &gt;50</small></label></div>
-      <div class="task"><input type="checkbox" id="hl1"><label for="hl1">Первая неделя тренировок: A вт · B чт · C сб — лёгкие веса, техника</label></div>
+      <div class="task"><input type="checkbox" id="hl1"><label for="hl1">Первая неделя тренировок: A → B → C через день — лёгкие веса, техника</label></div>
       <div class="task"><input type="checkbox" id="t12"><label for="t12">Структура питания: основные приёмы + заранее выбранные перекусы</label></div>
       <div class="task"><input type="checkbox" id="hl2"><label for="hl2">Вс: готовить белковую еду на неделю</label></div>
       <div class="task"><input type="checkbox" id="w13"><label for="w13">Без алкоголя — правило эксперимента до 31.08</label></div>
@@ -668,21 +668,23 @@
       train:'Всё −40%: лёгкие веса, йога, прогулки. Сон в приоритете.',
       food:'Магний вечером, стабильный сахар: тыквенные семечки, зелень, тёмный шоколад. +5–10% ккал — норма.'};
   }
-  /* силовые: вт A · чт B · сб C (старт 14.07) */
-  var TRAIN_WEEK=[
-    'Отдых. Приготовить белковую еду на неделю',        /* вс */
-    'Йога + прогулка 30–40 мин',                        /* пн */
-    'Силовая A · низ тела: ягодицы и ноги',             /* вт */
-    'Йога + спокойный сайкл (по желанию)',              /* ср */
-    'Силовая B · верх тела: спина, плечи, руки',        /* чт */
-    'Йога / мобилити',                                  /* пт */
-    'Силовая C · всё тело + ягодицы'                    /* сб */
+  /* силовые через день: 12.07 A → 14.07 B → 16.07 C → 18.07 A → … */
+  var TRAIN_TYPES=[
+    'Силовая A · низ тела: ягодицы и ноги',
+    'Силовая B · верх тела: спина, плечи, руки',
+    'Силовая C · всё тело + ягодицы'
   ];
+  function trainFor(dateISO){
+    var k=diffDays('2026-07-12',dateISO);
+    if(k>=0&&k%2===0)return TRAIN_TYPES[Math.floor(k/2)%3];
+    var t='Йога, мобилити или прогулка — день восстановления';
+    if(parse(dateISO).getDay()===0)t+='. Приготовить белковую еду на неделю';
+    return t;
+  }
   function renderBody(){
-    var n=cycleDayFor(TODAY), ph=cyclePhase(n), dow=new Date().getDay();
-    var t=TRAIN_WEEK[dow];
-    if(TODAY<'2026-07-14')t='Старт тренировок завтра, 14.07 (вт) — силовая A. Сегодня йога/прогулка по желанию';
-    else if(ph&&(n<=5||n>=24))t+=' — в эту фазу легче, без героизма';
+    var n=cycleDayFor(TODAY), ph=cyclePhase(n);
+    var t=trainFor(TODAY);
+    if(ph&&(n<=5||n>=24))t+=' — в эту фазу легче, без героизма';
     document.getElementById('body-train').textContent=t;
     document.getElementById('body-phase').textContent=ph?'День '+n+' · '+ph.name:'Отметь начало цикла, чтобы видеть фазу';
     document.getElementById('body-food').textContent=(ph?ph.food+' ':'')+'База: белок 95–120 г, 1900–2100 ккал.';
